@@ -61,9 +61,9 @@
 <body>
 
     <div id="overlay">
-        <div class="title">森羅万象</div>
+        <div class="title">THE UNIVERSE</div>
         <div class="subtitle">Omni-Source Real-time Stream</div>
-        <button id="start-btn">接続 / CONNECT</button>
+        <button id="start-btn">CONNECT</button>
     </div>
 
     <div id="hud">
