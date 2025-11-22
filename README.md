@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Omni-Source: Infinite Variations</title>
+    <title>Omni-Source: THE UNIVERSE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,14 +46,14 @@
             background: #000510; z-index: 100; display: flex; flex-direction: column;
             align-items: center; justify-content: center; transition: opacity 3s ease;
         }
-        .title { font-size: 4vw; font-weight: 500; letter-spacing: 0.5em; margin-bottom: 15px; color: #e0f0ff; text-shadow: 0 0 20px rgba(200,230,255,0.3); }
+        .title { font-size: 5vw; font-weight: 500; letter-spacing: 0.3em; margin-bottom: 15px; color: #e0f0ff; text-shadow: 0 0 20px rgba(200,230,255,0.3); }
         .subtitle { font-size: 11px; color: #8899aa; margin-bottom: 50px; font-family: 'Roboto Mono'; letter-spacing: 4px; }
         #start-btn {
             background: transparent; border: 1px solid rgba(255,255,255,0.3); color: #e0e0e0;
             padding: 15px 50px; font-family: 'Shippori Mincho', serif; font-size: 14px; font-weight: 500;
-            letter-spacing: 6px; cursor: pointer; transition: 0.8s; border-radius: 50px;
+            letter-spacing: 4px; cursor: pointer; transition: 0.8s; border-radius: 50px;
         }
-        #start-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.8); box-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        #start-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.8); box-shadow: 0 0 30px rgba(255,255,255,0.2); transform: scale(1.05); color: white; }
         
         #sys-log {
             position: absolute; bottom: 30px; left: 30px; z-index: 20;
@@ -70,8 +70,8 @@
 
     <div id="overlay">
         <div class="title">THE UNIVERSE</div>
-        <div class="subtitle">INFINITE VARIATIONS</div>
-        <button id="start-btn">connect</button>
+        <div class="subtitle">Global Real-time Stream</div>
+        <button id="start-btn">CONNECT</button>
     </div>
 
     <div id="hud">
@@ -80,8 +80,8 @@
         <div>ENV <span id="env-display" class="hud-val">--</span></div>
     </div>
 
-    <div id="sys-log">Initializing Audio Morphing...</div>
-    <div id="source-list">Waiting for stream...</div>
+    <div id="sys-log">Initializing System...</div>
+    <div id="source-list">Waiting for connection...</div>
 
     <div id="controls">
         <button class="btn" onclick="toggleLog()">LOG ON/OFF</button>
@@ -96,7 +96,7 @@
     <script>
         // --- CONFIGURATION ---
         const CONFIG = {
-            spawnRate: 200,      
+            spawnRate: 180,      
             wordLife: 65000,     
             baseSize: 60,        
             minSize: 35,         
@@ -105,23 +105,26 @@
             fogDensity: 0.0003   
         };
 
-        // --- RSS SOURCES ---
+        // --- MIXED SOURCES (JP & EN) ---
         const ALL_FEEDS = [
+            // English Global
+            { name: "BBC WORLD", url: "https://feeds.bbci.co.uk/news/world/rss.xml" },
+            { name: "CNN TOP", url: "http://rss.cnn.com/rss/edition.rss" },
+            { name: "REUTERS", url: "https://www.reutersagency.com/feed/?best-topics=political-general&post_type=best" },
+            { name: "AL JAZEERA", url: "https://www.aljazeera.com/xml/rss/all.xml" },
+            { name: "NASA", url: "https://www.nasa.gov/rss/dyn/breaking_news.rss" },
+            { name: "TECHCRUNCH", url: "https://techcrunch.com/feed/" },
+            { name: "THE VERGE", url: "https://www.theverge.com/rss/index.xml" },
+            { name: "WIRED US", url: "https://www.wired.com/feed/rss" },
+            { name: "ART NEWS", url: "https://www.artnews.com/feed/" },
+            { name: "HYPEBEAST", url: "https://hypebeast.com/feed" },
+            
+            // Japanese
             { name: "NHK NEWS", url: "https://www3.nhk.or.jp/rss/news/cat0.xml" },
             { name: "YAHOO! TOP", url: "https://news.yahoo.co.jp/rss/topics/top-picks.xml" },
             { name: "ASAHI", url: "https://www.asahi.com/rss/asahi/newsheadlines.rdf" },
-            { name: "NIKKEI", url: "https://assets.wor.jp/rss/rdf/nikkei/news.rdf" },
-            { name: "DIAMOND", url: "https://diamond.jp/list/feed/rss" },
-            { name: "FORBES JP", url: "https://forbesjapan.com/feed/" },
-            { name: "WIRED JP", url: "https://wired.jp/rss/index.xml" },
-            { name: "GIZMODO", url: "https://www.gizmodo.jp/index.xml" },
-            { name: "NAZOLOGY", url: "https://nazology.net/feed" },
-            { name: "SORAE", url: "https://sorae.info/feed" },
-            { name: "NAT GEO", url: "https://natgeo.nikkeibp.co.jp/rss/index.xml" },
-            { name: "BIJUTSU", url: "https://bijutsutecho.com/rss" },
-            { name: "VOGUE", url: "https://www.vogue.co.jp/rss/vogue" },
-            { name: "CINRA", url: "https://www.cinra.net/feed" },
-            { name: "PEN", url: "https://www.pen-online.jp/feed" }
+            { name: "GIZMODO JP", url: "https://www.gizmodo.jp/index.xml" },
+            { name: "VOGUE JP", url: "https://www.vogue.co.jp/rss/vogue" }
         ];
 
         const PROXY = "https://api.rss2json.com/v1/api.json?rss_url=";
@@ -130,20 +133,20 @@
         const TYPE_NEUTRAL=0, TYPE_HOPE=1, TYPE_CRISIS=2, TYPE_TECH=3, TYPE_NATURE=4, TYPE_ART=5, TYPE_MONEY=6;
         
         const CLASSIFIER = {
-            crisis: ["WAR","CRISIS","DEATH","KILL","ATTACK","DANGER","WARNING","VICTIM","戦争","危機","災害","殺害","事故","警報","死亡","脅威","爆発","炎上","地震","津波","被害","倒産","容疑","逮捕","衝突","ミサイル","闇","不倫","死去"],
-            hope:  ["PEACE","WIN","HOPE","SUCCESS","JOY","BEST","HEAL","LOVE","SAVE","VICTORY","平和","希望","支援","回復","優勝","成功","愛","救助","勝利","祝福","金メダル","解決","誕生","新発見","ノーベル","結婚","推し","祝","最高","祈り"],
-            tech:  ["AI","SPACE","DATA","FUTURE","CYBER","QUANTUM","ROBOT","APP","CODE","APPLE","GOOGLE","宇宙","未来","技術","開発","人工知能","量子","ロケット","電脳","スマホ","アプリ","生成","半導体","コード","実験","科学"],
-            nature: ["EARTH","CLIMATE","OCEAN","FOREST","ANIMAL","PLANET","STORM","HEAT","GREEN","地球","環境","海","森","気候","動物","台風","猛暑","温暖化","自然","生物","発見","星","細胞","猫","犬","鳥","雪","雨","月","花"],
-            art:   ["ART","SOUL","COLOR","MIND","DREAM","POEM","MUSIC","FILM","IDEA","DESIGN","芸術","魂","夢","思考","色","哲学","映画","音楽","言葉","感性","作品","展示","デザイン","建築","美","文学","文化","絵画"],
-            money: ["MARKET","STOCK","MONEY","DOLLAR","PRICE","TRADE","ECONOMY","BITCOIN","株","円","ドル","経済","市場","投資","価格","値上げ","金融","売上","利益","買収","上場","税","安","高"]
+            crisis: ["WAR","CRISIS","DEATH","KILL","ATTACK","DANGER","WARNING","VICTIM","BOMB","BLAST","CRASH","DISASTER","戦争","危機","災害","殺害","事故","警報","死亡","脅威","爆発","炎上","地震","津波","被害","倒産","容疑","逮捕","衝突","ミサイル","闇","不倫","死去"],
+            hope:  ["PEACE","WIN","HOPE","SUCCESS","JOY","BEST","HEAL","LOVE","SAVE","VICTORY","AWARD","PRIZE","PEACE","平和","希望","支援","回復","優勝","成功","愛","救助","勝利","祝福","金メダル","解決","誕生","新発見","ノーベル","結婚","推し","祝","最高","祈り"],
+            tech:  ["AI","SPACE","DATA","FUTURE","CYBER","QUANTUM","ROBOT","APP","CODE","APPLE","GOOGLE","MICROSOFT","META","LAUNCH","ROCKET","宇宙","未来","技術","開発","人工知能","量子","ロケット","電脳","スマホ","アプリ","生成","半導体","コード","実験","科学"],
+            nature: ["EARTH","CLIMATE","OCEAN","FOREST","ANIMAL","PLANET","STORM","HEAT","GREEN","WILD","NATURE","ENVIRONMENT","地球","環境","海","森","気候","動物","台風","猛暑","温暖化","自然","生物","発見","星","細胞","猫","犬","鳥","雪","雨","月","花"],
+            art:   ["ART","SOUL","COLOR","MIND","DREAM","POEM","MUSIC","FILM","IDEA","DESIGN","STYLE","FASHION","CULTURE","MOVIE","芸術","魂","夢","思考","色","哲学","映画","音楽","言葉","感性","作品","展示","デザイン","建築","美","文学","文化","絵画"],
+            money: ["MARKET","STOCK","MONEY","DOLLAR","PRICE","TRADE","ECONOMY","BITCOIN","FINANCE","BUSINESS","BANK","株","円","ドル","経済","市場","投資","価格","値上げ","金融","売上","利益","買収","上場","税","安","高"]
         };
         
         const STOP_WORDS = [
-            "THE","AND","FOR","WITH","NEWS","LIVE","FROM","THAT","REPORT","NEW","VIDEO","SAYS","YOUR","UPDATE","TODAY","THIS","WHAT","WHICH","WHEN","WHERE","WHO","HOW","WHY","ARE","WAS","WERE","BEEN","HAVE","HAS","HAD","DOES","DID","CAN","COULD","WOULD","SHOULD","WILL","ABOUT","AFTER","BEFORE","UNDER","OVER","INTO","ONTO","JUST","ONLY","MORE","MOST","SOME","ANY","OTHER","THAN","THEN","NOW","HERE","THERE","OUT","OFF","DOWN","UP",
+            "THE","AND","FOR","WITH","NEWS","LIVE","FROM","THAT","REPORT","NEW","VIDEO","SAYS","YOUR","UPDATE","TODAY","THIS","WHAT","WHICH","WHEN","WHERE","WHO","HOW","WHY","ARE","WAS","WERE","BEEN","HAVE","HAS","HAD","DOES","DID","CAN","COULD","WOULD","SHOULD","WILL","ABOUT","AFTER","BEFORE","UNDER","OVER","INTO","ONTO","JUST","ONLY","MORE","MOST","SOME","ANY","OTHER","THAN","THEN","NOW","HERE","THERE","OUT","OFF","DOWN","UP","LIKE","INTO","TIME","YEAR","OVER",
             "あ","い","う","え","お","の","に","は","を","が","で","て","と","も","し","た","る","こと","ます","です","さん","など","よう","その","この","あの","これ","それ","あれ","から","ので","もの","ない","って","いう","速報","情報","一覧","更新","記事","詳細","画像","写真","公開","開催","決定","発表","開始","終了","確認","問題","理由","方法","解説","結果","内容","対応","検討"
         ];
 
-        const BACKUP = [{t:"静寂",s:"...",y:TYPE_NATURE},{t:"待機",s:"...",y:TYPE_NEUTRAL},{t:"深呼吸",s:"...",y:TYPE_ART}];
+        const BACKUP = [{t:"Silence",s:"...",y:TYPE_NATURE},{t:"Waiting",s:"...",y:TYPE_NEUTRAL},{t:"Breath",s:"...",y:TYPE_ART}];
 
         let wordBuffer = [];
         let appState = { 
@@ -166,7 +169,7 @@
             water: null,      
             ground: null,     
             bird: null,       
-            wood: null, // Added for nature variation
+            wood: null, 
             choir: null,      
             reverb: null,
             
@@ -193,14 +196,14 @@
 
                 // 3. EVENT INSTRUMENTS (High Variance)
                 
-                // A. HARP (Neutral) - Variable Pluck
+                // A. HARP (Neutral)
                 this.harp = new Tone.PolySynth(Tone.Synth, {
                     oscillator: { type: "triangle" },
                     envelope: { attack: 0.01, decay: 0.4, sustain: 0, release: 1 } 
                 }).connect(masterComp);
                 this.harp.volume.value = -14;
 
-                // B. CHIME (Money) - Metallic FM
+                // B. CHIME (Money)
                 const panner = new Tone.Panner3D().connect(masterComp);
                 this.chime = new Tone.PolySynth(Tone.FMSynth, {
                     harmonicity: 3, modulationIndex: 10, oscillator: { type: "sine" },
@@ -209,14 +212,14 @@
                 }).connect(panner);
                 this.chime.volume.value = -16;
 
-                // C. WATER (Tech) - Sine drops
+                // C. WATER (Tech)
                 this.water = new Tone.PolySynth(Tone.Synth, {
                     oscillator: { type: "sine" },
                     envelope: { attack: 0.005, decay: 0.3, sustain: 0, release: 0.1 }
                 }).connect(new Tone.PingPongDelay("8n", 0.3).connect(masterComp));
                 this.water.volume.value = -14;
 
-                // D. GROUND (Crisis) - Deep Pulse
+                // D. GROUND (Crisis)
                 this.ground = new Tone.MembraneSynth({
                     pitchDecay: 0.05, octaves: 2, oscillator: { type: "sine" },
                     envelope: { attack: 0.01, decay: 0.8, sustain: 0.01, release: 1.4 }
@@ -231,14 +234,14 @@
                 }).connect(masterComp);
                 this.choir.volume.value = -14;
 
-                // F. NATURE 1 (Bird - High)
+                // F. NATURE 1 (Bird)
                 this.bird = new Tone.PolySynth(Tone.Synth, {
                     oscillator: { type: "triangle" },
                     envelope: { attack: 0.02, decay: 0.2, sustain: 0.1, release: 1 },
                 }).connect(new Tone.FeedbackDelay("8n", 0.4).connect(masterComp));
                 this.bird.volume.value = -18;
 
-                // G. NATURE 2 (Wood - Short)
+                // G. NATURE 2 (Wood)
                 this.wood = new Tone.PolySynth(Tone.MembraneSynth, {
                     pitchDecay: 0.01, octaves: 4, oscillator: { type: "sine" },
                     envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 }
@@ -264,34 +267,25 @@
                 if(!isAudioReady) return;
                 const now = Tone.now();
                 const t = now + Math.random() * 0.1;
-
-                // Randomize Note from Scale
                 const noteIdx = Math.floor(Math.random() * SCALE.length);
                 const note = SCALE[noteIdx];
 
                 switch(type) {
-                    case TYPE_MONEY: // Variation: Bell vs Coin
-                        // Morphing: Change harmonicity for different metal textures
+                    case TYPE_MONEY: 
                         const bellHarm = 1 + Math.random() * 5; 
                         this.chime.set({ harmonicity: bellHarm });
-                        
                         if(Math.random() > 0.7) {
-                            // Coin trill
                             this.chime.triggerAttackRelease(note, "32n", t);
                             this.chime.triggerAttackRelease(note, "32n", t + 0.05);
                         } else {
-                            // Single Bell
                             this.chime.triggerAttackRelease(Tone.Frequency(note).transpose(12), "2n", t);
                         }
                         break;
 
-                    case TYPE_TECH: // Variation: Big Drop vs Small Drip
-                        // Morphing: Change pitch decay for different "drop sizes"
+                    case TYPE_TECH: 
                         const decayTime = 0.1 + Math.random() * 0.4;
                         this.water.set({ envelope: { decay: decayTime } });
-                        
                         if(Math.random() > 0.8) {
-                            // Glitch
                             this.water.triggerAttackRelease(note, "64n", t);
                             this.water.triggerAttackRelease(Tone.Frequency(note).transpose(12), "64n", t + 0.05);
                         } else {
@@ -299,46 +293,37 @@
                         }
                         break;
 
-                    case TYPE_CRISIS: // Variation: Deep Pulse vs Sub Swell
+                    case TYPE_CRISIS: 
                         if(Math.random() > 0.5) {
-                            this.ground.triggerAttackRelease("C1", "1n", t); // Low rumble
+                            this.ground.triggerAttackRelease("C1", "1n", t); 
                         } else {
-                            this.ground.triggerAttackRelease("C2", "4n", t); // Pulse
+                            this.ground.triggerAttackRelease("C2", "4n", t); 
                         }
                         break;
 
                     case TYPE_HOPE:
-                    case TYPE_ART: // Variation: Chord vs Arpeggio
-                        // Morphing: Change Harmonicity for "Brightness"
+                    case TYPE_ART: 
                         this.choir.set({ harmonicity: 1 + Math.random() });
-                        
                         if(Math.random() > 0.6) {
-                            // Chord
                             const chord = [SCALE[noteIdx % 5], SCALE[(noteIdx+2)%5], SCALE[(noteIdx+4)%5]];
                             this.choir.triggerAttackRelease(chord, "1n", t);
                         } else {
-                            // Single Swell
                             this.choir.triggerAttackRelease(note, "2n", t);
                         }
                         break;
 
-                    case TYPE_NATURE: // Variation: Bird vs Wood
+                    case TYPE_NATURE: 
                         if(Math.random() > 0.5) {
-                            // Bird (FM chirps)
                             this.bird.triggerAttackRelease(Tone.Frequency(note).transpose(24), "32n", t);
                         } else {
-                            // Wood (Dry knock)
                             this.wood.triggerAttackRelease(note, "16n", t);
                         }
                         break;
 
-                    default: // NEUTRAL (Harp) - Morphing Pluck
-                        // Morphing: Release time (Short pluck vs Ringing)
+                    default: 
                         const releaseT = 0.2 + Math.random() * 2;
                         this.harp.set({ envelope: { release: releaseT } });
-                        
                         if(Math.random() > 0.8) {
-                            // Strum
                             this.harp.triggerAttackRelease(note, "8n", t);
                             this.harp.triggerAttackRelease(Tone.Frequency(note).transpose(4), "8n", t + 0.05);
                         } else {
@@ -432,9 +417,9 @@
         async function fetchFeeds() {
             const shuffled = ALL_FEEDS.sort(() => 0.5 - Math.random());
             const selectedFeeds = shuffled.slice(0, 8);
-            document.getElementById('source-list').innerHTML = "Listening to:<br>" + selectedFeeds.map(f => f.name).join("<br>");
+            document.getElementById('source-list').innerHTML = "Connected to:<br>" + selectedFeeds.map(f => f.name).join("<br>");
 
-            log(`Gathering thoughts...`);
+            log(`Scanning frequencies...`);
             const promises = selectedFeeds.map(f => fetch(PROXY + encodeURIComponent(f.url)).then(r=>r.ok?r.json():null).catch(e=>null));
             const results = await Promise.all(promises);
             
@@ -448,7 +433,7 @@
                 }
             });
             if(count === 0) BACKUP.forEach(d => wordBuffer.push({text:d.t, source:d.s, type:d.y}));
-            log(`Received ${count} signals.`);
+            log(`Detected ${count} entities.`);
         }
 
         function processTitle(title, source) {
